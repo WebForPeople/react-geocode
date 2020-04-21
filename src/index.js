@@ -8,6 +8,7 @@ let DEBUG = false;
 let API_KEY = null;
 let LANGUAGE = "en";
 let REGION = null;
+
 const GOOGLE_API = "https://maps.google.com/maps/api/geocode/json";
 
 function log(message, warn = false) {
@@ -126,9 +127,10 @@ export default {
    * @param {string} [apiKey]
    * @param {string} [language]
    * @param {string} [region]
+   * @param {object} [components]
    * @returns {Promise}
    */
-  async fromAddress(address, apiKey, language, region) {
+  async fromAddress(address, apiKey, language, region, components) {
     if (!address) {
       log("Provided address is invalid", true);
       return Promise.reject(new Error("Provided address is invalid"));
@@ -150,7 +152,20 @@ export default {
       REGION = region || REGION;
       url += `&region=${encodeURIComponent(REGION)}`;
     }
-
+    if (typeof components === 'object' && components !== null){
+      let elements = "&components=";
+      for (var component in components) {
+        if (components.hasOwnProperty(component)) {
+          if (elements.length > 12) {
+              elements += "|";
+          }
+          elements += component + ":" + encodeURIComponent(components[component]); 
+        }
+      }
+      if (elements.length > 12) {
+        url += elements;
+      }
+    }
     return handleUrl(url);
   }
 };
