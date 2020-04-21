@@ -4,13 +4,22 @@
  * @package react-geocode
  * @author  Pir Shukarulalh Shah <shuker_rashdi@hotmail.com>  (http://www.shukarullah.com)
  */
-let DEBUG = false;
-let API_KEY = null;
-let LANGUAGE = "en";
-let REGION = null;
 
+/** @type {boolean | null} */
+let DEBUG = false;
+/** @type {string | null} */
+let API_KEY = null;
+/** @type {string | null} */
+let LANGUAGE = "en";
+/** @type {string | number | boolean | null} */
+let REGION = null;
+/** @type {string | null} */
 const GOOGLE_API = "https://maps.google.com/maps/api/geocode/json";
 
+/**
+ * @param {string} message
+ * @param {boolean} warn
+ */
 function log(message, warn = false) {
   if (DEBUG) {
     if (warn) {
@@ -21,6 +30,10 @@ function log(message, warn = false) {
   }
 }
 
+/**
+ * @param {RequestInfo} url
+ * @returns {Promise<any>}
+ */
 async function handleUrl(url) {
   const response = await fetch(url).catch(() =>
     Promise.reject(new Error("Error fetching data"))
@@ -46,7 +59,7 @@ async function handleUrl(url) {
   );
 }
 
-export default {
+const reactGeocode = {
   /**
    *
    *
@@ -90,8 +103,8 @@ export default {
    * @param {string} lng
    * @param {string} [apiKey]
    * @param {string} [language]
-   * @param {string} [region]
-   * @returns {Promise}
+   * @param {string | null} [region]
+   * @returns {Promise<any>}
    */
   async fromLatLng(lat, lng, apiKey, language, region) {
     if (!lat || !lng) {
@@ -114,6 +127,7 @@ export default {
 
     if (region || REGION) {
       REGION = region || REGION;
+      // @ts-ignore
       url += `&region=${encodeURIComponent(REGION)}`;
     }
 
@@ -126,9 +140,9 @@ export default {
    * @param {string} address
    * @param {string} [apiKey]
    * @param {string} [language]
-   * @param {string} [region]
-   * @param {object} [components]
-   * @returns {Promise}
+   * @param {string | null} [region]
+   * @param {{[key: string]: any}} [components]
+   * @returns {Promise<any>}
    */
   async fromAddress(address, apiKey, language, region, components) {
     if (!address) {
@@ -150,16 +164,17 @@ export default {
 
     if (region || REGION) {
       REGION = region || REGION;
+      // @ts-ignore
       url += `&region=${encodeURIComponent(REGION)}`;
     }
     if (typeof components === 'object' && components !== null){
-      let elements = "&components=";
+      let elements = `&components=`;
       for (var component in components) {
         if (components.hasOwnProperty(component)) {
           if (elements.length > 12) {
               elements += "|";
           }
-          elements += component + ":" + encodeURIComponent(components[component]); 
+          elements += component + `:` + encodeURIComponent(components[component]); 
         }
       }
       if (elements.length > 12) {
@@ -169,3 +184,5 @@ export default {
     return handleUrl(url);
   }
 };
+
+export default reactGeocode;
